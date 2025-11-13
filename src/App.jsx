@@ -90,15 +90,20 @@ export default function App() {
     },
   ], [])
 
-  // Default realistic robot overlay (can be disabled via ?robot=0)
+  // URL controls for robot overlay
   const params = new URLSearchParams(window.location.search)
   const robotParam = params.get('robot')
   const robotEnabled = robotParam !== '0'
 
-  // Default robot scene (override with ?robotUrl=...)
   const defaultRobotScene = 'https://prod.spline.design/Ogq0nP1mJr1nqjQz/scene.splinecode'
   const robotSceneParam = params.get('robotUrl')
   const robotScene = robotSceneParam || defaultRobotScene
+
+  const robotScale = parseFloat(params.get('robotScale') || '1')
+  const robotOpacity = parseFloat(params.get('robotOpacity') || '0.6')
+  const robotOffsetX = parseFloat(params.get('robotX') || '0')
+  const robotOffsetY = parseFloat(params.get('robotY') || '0')
+  const robotBlend = params.get('robotBlend') || 'screen'
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f1226] via-[#0b1021] to-[#090e1b] text-white">
@@ -112,9 +117,17 @@ export default function App() {
             <SplineScene scene="https://prod.spline.design/4cHQr84zOGAHOehh/scene.splinecode" style={{ width: '100%', height: '100%' }} />
           </div>
 
-          {/* Realistic robot overlay (on by default) */}
+          {/* Realistic robot overlay with tuning via URL params */}
           {robotEnabled && (
-            <div className="absolute inset-0 opacity-65 mix-blend-screen">
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                opacity: robotOpacity,
+                mixBlendMode: robotBlend,
+                transform: `translate3d(${robotOffsetX}px, ${robotOffsetY}px, 0) scale(${robotScale})`,
+                transformOrigin: 'center center',
+              }}
+            >
               <SplineScene scene={robotScene} style={{ width: '100%', height: '100%' }} />
             </div>
           )}
