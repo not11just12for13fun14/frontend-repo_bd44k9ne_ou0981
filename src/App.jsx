@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import Spline from '@splinetool/react-spline'
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Cpu, Bot, Database, Globe2, Sparkles } from 'lucide-react'
+import Navbar from './components/Navbar'
 
 function Badge({ children }) {
   return (
@@ -37,6 +38,33 @@ function ProjectCard({ title, tags, description, link }) {
   )
 }
 
+function MotionBackground() {
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      {/* Soft gradient veil */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0f1226]/60 via-[#0b1021]/40 to-[#090e1b]" />
+      <div className="absolute inset-0 bg-[radial-gradient(60%_40%_at_50%_10%,rgba(124,58,237,0.25),transparent)]" />
+      {/* Floating orbs */}
+      {[
+        { x: '10%', y: '20%', size: 220, color: 'from-purple-500/25 to-transparent', delay: 0 },
+        { x: '80%', y: '30%', size: 180, color: 'from-blue-500/20 to-transparent', delay: 0.6 },
+        { x: '50%', y: '70%', size: 260, color: 'from-orange-400/15 to-transparent', delay: 1.2 },
+      ].map((o, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0.4, y: 0 }}
+          animate={{ opacity: [0.35, 0.6, 0.35], y: [-6, 6, -6] }}
+          transition={{ duration: 6 + i, repeat: Infinity, delay: o.delay, ease: 'easeInOut' }}
+          className={`absolute -translate-x-1/2 -translate-y-1/2 w-[${o.size}px] h-[${o.size}px] rounded-full bg-gradient-to-br ${o.color} blur-3xl`}
+          style={{ left: o.x, top: o.y }}
+        />
+      ))}
+      {/* Subtle grid lines */}
+      <div className="absolute inset-0 opacity-[0.07] mix-blend-screen bg-[radial-gradient(circle_at_center,#ffffff_1px,transparent_1px)] [background-size:22px_22px]" />
+    </div>
+  )
+}
+
 export default function App() {
   const projects = useMemo(() => [
     {
@@ -62,38 +90,34 @@ export default function App() {
     },
   ], [])
 
+  // Optional: enable a realistic robot background via URL params
+  // Use: ?robot=1&robotUrl=https://prod.spline.design/your-robot/scene.splinecode
+  const params = new URLSearchParams(window.location.search)
+  const robotEnabled = params.get('robot') === '1'
+  const robotSceneParam = params.get('robotUrl')
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f1226] via-[#0b1021] to-[#090e1b] text-white">
-      {/* Navbar */}
-      <header className="fixed top-0 inset-x-0 z-50 border-b border-white/10 bg-white/10 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <a href="#" className="text-sm font-semibold tracking-wider uppercase">
-            <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-orange-300 bg-clip-text text-transparent">Developer Portfolio</span>
-          </a>
-          <nav className="hidden md:flex items-center gap-8 text-sm text-white/80">
-            <a href="#work" className="hover:text-white transition-colors">Work</a>
-            <a href="#skills" className="hover:text-white transition-colors">Skills</a>
-            <a href="#about" className="hover:text-white transition-colors">About</a>
-            <a href="#contact" className="hover:text-white transition-colors">Contact</a>
-            <div className="flex items-center gap-4">
-              <a href="https://github.com/" target="_blank" rel="noreferrer" aria-label="GitHub" className="hover:text-white"><Github size={18} /></a>
-              <a href="https://linkedin.com/" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="hover:text-white"><Linkedin size={18} /></a>
-              <a href="#contact" aria-label="Email" className="hover:text-white"><Mail size={18} /></a>
-            </div>
-          </nav>
-        </div>
-      </header>
+      <Navbar />
 
-      {/* Hero Section with Spline */}
+      {/* Hero Section with layered motion background */}
       <section className="relative pt-32 md:pt-36 pb-24" id="home">
         <div className="absolute inset-0 overflow-hidden">
+          {/* Base AI aura animation */}
           <div className="absolute inset-0 opacity-70">
             <Spline scene="https://prod.spline.design/4cHQr84zOGAHOehh/scene.splinecode" style={{ width: '100%', height: '100%' }} />
           </div>
-          {/* Soft gradient overlays that don't block interaction */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0f1226]/60 via-[#0b1021]/40 to-[#090e1b]" />
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_40%_at_50%_10%,rgba(124,58,237,0.25),transparent)]" />
+
+          {/* Optional realistic robot overlay (customizable via URL) */}
+          {robotEnabled && robotSceneParam && (
+            <div className="absolute inset-0 opacity-70 mix-blend-screen">
+              <Spline scene={robotSceneParam} style={{ width: '100%', height: '100%' }} />
+            </div>
+          )}
+
+          <MotionBackground />
         </div>
+
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
