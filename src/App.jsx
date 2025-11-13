@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
-import Spline from '@splinetool/react-spline'
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Cpu, Bot, Database, Globe2, Sparkles } from 'lucide-react'
 import Navbar from './components/Navbar'
+import SplineScene from './components/SplineScene'
 
 function Badge({ children }) {
   return (
@@ -55,8 +55,8 @@ function MotionBackground() {
           initial={{ opacity: 0.4, y: 0 }}
           animate={{ opacity: [0.35, 0.6, 0.35], y: [-6, 6, -6] }}
           transition={{ duration: 6 + i, repeat: Infinity, delay: o.delay, ease: 'easeInOut' }}
-          className={`absolute -translate-x-1/2 -translate-y-1/2 w-[${o.size}px] h-[${o.size}px] rounded-full bg-gradient-to-br ${o.color} blur-3xl`}
-          style={{ left: o.x, top: o.y }}
+          className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br ${o.color} blur-3xl`}
+          style={{ left: o.x, top: o.y, width: o.size, height: o.size }}
         />
       ))}
       {/* Subtle grid lines */}
@@ -90,11 +90,15 @@ export default function App() {
     },
   ], [])
 
-  // Optional: enable a realistic robot background via URL params
-  // Use: ?robot=1&robotUrl=https://prod.spline.design/your-robot/scene.splinecode
+  // Default realistic robot overlay (can be disabled via ?robot=0)
   const params = new URLSearchParams(window.location.search)
-  const robotEnabled = params.get('robot') === '1'
+  const robotParam = params.get('robot')
+  const robotEnabled = robotParam !== '0'
+
+  // Default robot scene (override with ?robotUrl=...)
+  const defaultRobotScene = 'https://prod.spline.design/Ogq0nP1mJr1nqjQz/scene.splinecode'
   const robotSceneParam = params.get('robotUrl')
+  const robotScene = robotSceneParam || defaultRobotScene
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f1226] via-[#0b1021] to-[#090e1b] text-white">
@@ -105,13 +109,13 @@ export default function App() {
         <div className="absolute inset-0 overflow-hidden">
           {/* Base AI aura animation */}
           <div className="absolute inset-0 opacity-70">
-            <Spline scene="https://prod.spline.design/4cHQr84zOGAHOehh/scene.splinecode" style={{ width: '100%', height: '100%' }} />
+            <SplineScene scene="https://prod.spline.design/4cHQr84zOGAHOehh/scene.splinecode" style={{ width: '100%', height: '100%' }} />
           </div>
 
-          {/* Optional realistic robot overlay (customizable via URL) */}
-          {robotEnabled && robotSceneParam && (
-            <div className="absolute inset-0 opacity-70 mix-blend-screen">
-              <Spline scene={robotSceneParam} style={{ width: '100%', height: '100%' }} />
+          {/* Realistic robot overlay (on by default) */}
+          {robotEnabled && (
+            <div className="absolute inset-0 opacity-65 mix-blend-screen">
+              <SplineScene scene={robotScene} style={{ width: '100%', height: '100%' }} />
             </div>
           )}
 
